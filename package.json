@@ -1,0 +1,132 @@
+{
+  "name": "monkey-ai",
+  "displayName": "Monkey AI Assistant",
+  "description": "A smart AI assistant for VS Code with automatic Ollama support",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": ["Other", "Machine Learning"],
+  "keywords": ["ai", "assistant", "ollama", "coding", "explanation"],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "monkey.askQuestion",
+        "title": "Ask Monkey AI",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "monkey.explainCode",
+        "title": "Monkey: Explain Selected Code",
+        "icon": "$(info)"
+      },
+      {
+        "command": "monkey.toggleMode",
+        "title": "Monkey: Toggle Local/Cloud Mode",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "monkey.startOllama",
+        "title": "Monkey: Start Ollama",
+        "icon": "$(play)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "monkey.askQuestion",
+        "key": "ctrl+shift+m",
+        "mac": "cmd+shift+m"
+      },
+      {
+        "command": "monkey.explainCode",
+        "key": "ctrl+shift+e",
+        "mac": "cmd+shift+e",
+        "when": "editorHasSelection"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "monkey.explainCode",
+          "when": "editorHasSelection",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "monkey.askQuestion"
+        },
+        {
+          "command": "monkey.explainCode",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "monkey.toggleMode"
+        },
+        {
+          "command": "monkey.startOllama"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Monkey AI",
+      "properties": {
+        "monkeyAI.useOllama": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use local Ollama instead of cloud API (recommended for privacy)"
+        },
+        "monkeyAI.ollamaModel": {
+          "type": "string",
+          "default": "llama2",
+          "description": "Ollama model to use (llama2, codellama, mistral, etc.)",
+          "enum": [
+            "llama2",
+            "codellama",
+            "mistral",
+            "deepseek-coder",
+            "phi",
+            "llama2:13b",
+            "codellama:7b",
+            "codellama:13b"
+          ]
+        },
+        "monkeyAI.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for cloud AI service (only needed when not using Ollama)"
+        },
+        "monkeyAI.model": {
+          "type": "string",
+          "default": "gpt-3.5-turbo",
+          "description": "Cloud AI model to use (when not using Ollama)",
+          "enum": [
+            "gpt-3.5-turbo",
+            "gpt-4",
+            "gpt-4-turbo-preview",
+            "claude-3-haiku",
+            "claude-3-sonnet"
+          ]
+        },
+        "monkeyAI.autoStart": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically start Ollama when needed"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "test": "node ./test/runTest.js",
+    "start-ollama": "node ollama-manager.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/monkey-ai.git"
+  },
+  "license": "MIT",
+  "author": "Your Name",
+  "publisher": "monkey-ai"
+}

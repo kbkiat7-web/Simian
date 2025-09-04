@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>simian</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+
+        :root {
+            --bg-color: #323437;
+            --main-color: #e2b714;
+            --sub-color: #646669;
+            --text-color: #d1d0c5;
+            --error-color: #ca4754;
+            --error-extra-color: #7e2a33;
+            --colorful-error-color: #ca4754;
+            --colorful-error-extra-color: #7e2a33;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-text {
+            font-size: 3rem;
+            font-weight: 600;
+            color: var(--main-color);
+            text-transform: lowercase;
+        }
+
+        .simian-icon {
+            font-size: 3rem;
+            opacity: 0.8;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover .simian-icon {
+            transform: rotate(15deg) scale(1.1);
+        }
+
+        .tagline {
+            color: var(--sub-color);
+            font-size: 1rem;
+            font-weight: 300;
+        }
+
+        .config-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.2s forwards;
+        }
+
+        .config-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .config-label {
+            color: var(--sub-color);
+            font-weight: 300;
+        }
+
+        select, input {
+            background: transparent;
+            border: none;
+            color: var(--main-color);
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+            padding: 0.2rem 0;
+            border-bottom: 1px solid var(--sub-color);
+            transition: all 0.3s ease;
+        }
+
+        select:hover, select:focus, input:hover, input:focus {
+            border-bottom-color: var(--main-color);
+        }
+
+        select option {
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--error-color);
+            margin-right: 0.5rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .status-indicator.connected {
+            background: var(--main-color);
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.4s forwards;
+        }
+
+        .messages {
+            flex: 1;
+            margin-bottom: 2rem;
+            min-height: 400px;
+            position: relative;
+        }
+
+        .message {
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .message-header {
+            font-size: 0.8rem;
+            color: var(--sub-color);
+            margin-bottom: 0.5rem;
+            font-weight: 300;
+        }
+
+        .message-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .user-message .message-content {
+            color: var(--main-color);
+        }
+
+        .ai-message .message-content {
+            color: var(--text-color);
+        }
+
+        .input-area {
+            position: relative;
+        }
+
+        .input-container {
+            position: relative;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        #messageInput {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 1.2rem;
+            padding: 1rem 0;
+            border-bottom: 2px solid var(--sub-color);
+            resize: vertical;
+            min-height: 60px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .send-btn {
+            background: transparent;
+            border: 1px solid var(--main-color);
+            color: var(--main-color);
+            padding: 0.8rem 1.5rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            white-space: nowrap;
+            height: fit-content;
+            margin-bottom: 1rem;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            background: var(--main-color);
+            color: var(--bg-color);
+            transform: translateY(-2px);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #messageInput:focus {
+            border-bottom-color: var(--main-color);
+        }
+
+        #messageInput::placeholder {
+            color: var(--sub-color);
+            font-style: italic;
+        }
+
+        .input-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--sub-color);
+            margin-top: 0.5rem;
+        }
+
+        .shortcuts {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .shortcut {
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .shortcut:hover {
+            opacity: 1;
+        }
+
+        .typing-indicator {
+            display: none;
+            color: var(--sub-color);
+            font-style: italic;
+            margin: 1rem 0;
+        }
+
+        .typing-indicator.show {
+            display: block;
+            animation: pulse 1.5s infinite;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            background: rgba(202, 71, 84, 0.1);
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            border-left: 3px solid var(--error-color);
+            font-size: 0.9rem;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 2rem;
+            border-radius: 0;
+        }
+
+        .tab {
+            padding: 0.8rem 2rem;
+            background: transparent;
+            border: none;
+            color: var(--sub-color);
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            font-weight: 300;
+        }
+
+        .tab:hover {
+            color: var(--text-color);
+        }
+
+        .tab.active {
+            color: var(--main-color);
+            border-bottom-color: var(--main-color);
+            font-weight: 400;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .code-area {
+            margin-bottom: 2rem;
+        }
+
+        .code-input {
+            width: 100%;
+            min-height: 200px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--sub-color);
+            border-radius: 4px;
+            padding: 1rem;
+            color: var(--text-color);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            outline: none;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .code-input:focus {
+            border-color: var(--main-color);
+        }
+
+        .code-input::placeholder {
+            color: var(--sub-color);
+            font-style: italic;
+        }
+
+        .explain-btn {
+            background: transparent;
+            border: 1px solid var(--main-color);
+            color: var(--main-color);
+            padding: 0.8rem 2rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            margin-top: 1rem;
+        }
+
+        .explain-btn:hover {
+            background: var(--main-color);
+            color: var(--bg-color);
+        }
+
+        .explain-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .explanation-result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            border-left: 3px solid var(--main-color);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid var(--sub-color);
+            border-radius: 50%;
+            border-top-color: var(--main-color);
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .logo-text {
+                font-size: 2rem;
+            }
+            
+            .simian-icon {
+                font-size: 2rem;
+            }
+            
+            .config-bar {
+                gap: 1rem;
+                font-size: 0.8rem;
+            }
+            
+            #messageInput {
+                font-size: 1rem;
+            }
+            
+            .tab {
+                padding: 0.6rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--sub-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--main-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <span class="simian-icon">&lt;/&gt;</span>
+                <h1 class="logo-text">simian</h1>
+            </div>
+            <p class="tagline">your local coding companion</p>
+        </div>
+
+        <div class="config-bar">
+            <div class="config-item">
+                <span class="status-indicator" id="statusIndicator"></span>
+                <span class="config-label">ollama</span>
+                <input type="text" id="ollamaUrl" value="http://localhost:11434" placeholder="ollama url" title="Change port if needed (e.g., 11435)">
+            </div>
+            <div class="config-item">
+                <span class="config-label">model</span>
+                <select id="modelSelect">
+                    <option value="llama2">llama2</option>
+                    <option value="codellama">codellama</option>
+                    <option value="mistral">mistral</option>
+                    <option value="deepseek-coder">deepseek-coder</option>
+                    <option value="phi">phi</option>
+                </select>
+            </div>
+            <div class="config-item">
+                <span class="config-label">temp</span>
+                <input type="number" id="temperature" value="0.7" min="0" max="1" step="0.1" style="width: 60px;">
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('chat')">chat</button>
+            <button class="tab" onclick="switchTab('explain')">explain code</button>
+        </div>
+
+        <div class="chat-area">
+            <div id="chat-tab" class="tab-content active">
+                <div class="messages" id="messages">
+                    <div class="message ai-message">
+                        <div class="message-header">simian</div>
+                        <div class="message-content">hey there! i'm your local assistant running on ollama. ask me anything about coding or paste some code for me to explain.</div>
+                    </div>
+                </div>
+                
+                <div class="typing-indicator" id="typingIndicator">
+                    <span class="loading-spinner"></span>simian is thinking...
+                </div>
+                
+                <div class="input-area">
+                    <div class="input-container">
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="ask me anything or paste code here..."
+                            rows="3"
+                        ></textarea>
+                        <button class="send-btn" onclick="sendMessage()" id="sendBtn">
+                            send
+                        </button>
+                    </div>
+                    <div class="input-footer">
+                        <div class="shortcuts">
+                            <span class="shortcut">enter to send</span>
+                            <span class="shortcut">escape to clear</span>
+                        </div>
+                        <div id="connectionStatus">connecting...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="explain-tab" class="tab-content">
+                <div class="code-area">
+                    <textarea 
+                        class="code-input" 
+                        id="codeInput"
+                        placeholder="paste your code here for explanation..."
+                        rows="12"
+                    ></textarea>
+                    <button class="explain-btn" onclick="explainCode()" id="explainBtn">
+                        explain code
+                    </button>
+                </div>
+                
+                <div id="explanationResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'chat';
+        let isConnected = false;
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const saved = localStorage.getItem('simian-ai-settings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                document.getElementById('ollamaUrl').value = settings.ollamaUrl || 'http://localhost:11434';
+                document.getElementById('modelSelect').value = settings.model || 'llama2';
+                document.getElementById('temperature').value = settings.temperature || 0.7;
+            }
+        }
+
+        // Save settings to localStorage
+        function saveSettings() {
+            const settings = {
+                ollamaUrl: document.getElementById('ollamaUrl').value,
+                model: document.getElementById('modelSelect').value,
+                temperature: parseFloat(document.getElementById('temperature').value)
+            };
+            localStorage.setItem('simian-settings', JSON.stringify(settings));
+        }
+
+        // Check Ollama connection
+        async function checkConnection() {
+            try {
+                const url = document.getElementById('ollamaUrl').value.replace(/\/$/, ''); // Remove trailing slash
+                
+                // Try multiple endpoints to see which works
+                let response;
+                try {
+                    response = await fetch(`${url}/api/tags`, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                        signal: AbortSignal.timeout(5000) // 5 second timeout
+                    });
+                } catch (fetchError) {
+                    // Try with different URLs
+                    const alternativeUrls = [
+                        'http://127.0.0.1:11434',
+                        'http://localhost:11435',
+                        'http://127.0.0.1:11435'
+                    ];
+                    
+                    let connected = false;
+                    for (const altUrl of alternativeUrls) {
+                        try {
+                            response = await fetch(`${altUrl}/api/tags`, {
+                                method: 'GET',
+                                headers: { 'Content-Type': 'application/json' },
+                                signal: AbortSignal.timeout(3000)
+                            });
+                            if (response.ok) {
+                                document.getElementById('ollamaUrl').value = altUrl;
+                                connected = true;
+                                break;
+                            }
+                        } catch (e) {
+                            continue;
+                        }
+                    }
+                    
+                    if (!connected) {
+                        throw fetchError;
+                    }
+                }
+                
+                if (response.ok) {
+                    isConnected = true;
+                    document.getElementById('statusIndicator').classList.add('connected');
+                    document.getElementById('connectionStatus').textContent = 'connected';
+                    
+                    // Update model list with available models
+                    const data = await response.json();
+                    updateModelList(data.models);
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                isConnected = false;
+                document.getElementById('statusIndicator').classList.remove('connected');
+                
+                // More helpful error messages
+                if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
+                    document.getElementById('connectionStatus').textContent = 'ollama not running - start "ollama serve" first';
+                } else if (error.message.includes('404')) {
+                    document.getElementById('connectionStatus').textContent = 'ollama running but no models found - run "ollama pull llama2"';
+                } else if (error.message.includes('timeout') || error.name === 'AbortError') {
+                    document.getElementById('connectionStatus').textContent = 'connection timeout - check ollama status';
+                } else {
+                    document.getElementById('connectionStatus').textContent = `connection failed - ${error.message}`;
+                }
+            }
+        }
+
+        // Update model dropdown with available models
+        function updateModelList(models) {
+            const select = document.getElementById('modelSelect');
+            const currentValue = select.value;
+            
+            // Clear and repopulate
+            select.innerHTML = '';
+            
+            if (models && models.length > 0) {
+                models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model.name.split(':')[0];
+                    option.textContent = model.name;
+                    select.appendChild(option);
+                });
+                
+                // Try to restore previous selection
+                if ([...select.options].some(opt => opt.value === currentValue)) {
+                    select.value = currentValue;
+                }
+            } else {
+                // Fallback options
+                const fallbacks = ['llama2', 'codellama', 'mistral', 'deepseek-coder', 'phi'];
+                fallbacks.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    select.appendChild(option);
+                });
+                select.value = currentValue || 'llama2';
+            }
+        }
+
+        // Switch tabs
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(`${tab}-tab`).classList.add('active');
+        }
+
+        // Add message to chat
+        function addMessage(content, isUser = false) {
+            const messages = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+            
+            messageDiv.innerHTML = `
+                <div class="message-header">${isUser ? 'you' : 'simian'}</div>
+                <div class="message-content">${content}</div>
+            `;
+            
+            messages.appendChild(messageDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        // Show typing indicator
+        function showTyping(show = true) {
+            const indicator = document.getElementById('typingIndicator');
+            indicator.classList.toggle('show', show);
+            
+            if (show) {
+                document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = `error: ${message}`;
+            
+            if (currentTab === 'chat') {
+                document.getElementById('messages').appendChild(errorDiv);
+            } else {
+                document.getElementById('explanationResult').appendChild(errorDiv);
+            }
+            
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+
+        // Call Ollama API
+        async function callOllama(prompt, isCode = false) {
+            if (!isConnected) {
+                throw new Error('not connected to ollama. make sure ollama is running and try again.');
+            }
+
+            const url = document.getElementById('ollamaUrl').value.replace(/\/$/, ''); // Remove trailing slash
+            const model = document.getElementById('modelSelect').value;
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            
+            const systemPrompt = isCode 
+                ? 'You are a helpful coding assistant. Explain code clearly and provide helpful insights. Use a casual, friendly tone.'
+                : 'You are simian, a helpful and friendly assistant. Keep responses concise and helpful. Use a casual tone and lowercase style when appropriate.';
+
+            try {
+                const response = await fetch(`${url}/api/generate`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        prompt: `${systemPrompt}\n\nUser: ${prompt}\n\nAssistant:`,
+                        stream: false,
+                        options: {
+                            temperature: temperature,
+                            top_p: 0.9,
+                            top_k: 40,
+                            num_predict: 512
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('model not found. try pulling the model first: ollama pull ' + model);
+                    } else if (response.status === 500) {
+                        throw new Error('ollama server error. check if the model is properly installed.');
+                    } else {
+                        throw new Error(`ollama responded with ${response.status}`);
+                    }
+                }
+
+                const data = await response.json();
+                
+                if (!data.response) {
+                    throw new Error('empty response from ollama');
+                }
+                
+                return data.response.trim();
+            } catch (error) {
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    throw new Error('cannot connect to ollama. is it running on the correct port?');
+                }
+                throw error;
+            }
+        }
+
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addMessage(message, true);
+            input.value = '';
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<span class="loading-spinner"></span>sending...';
+            showTyping(true);
+            
+            try {
+                const response = await callOllama(message);
+                addMessage(response);
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                showTyping(false);
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'send';
+                input.focus();
+            }
+        }
+
+        // Explain code
+        async function explainCode() {
+            const codeInput = document.getElementById('codeInput');
+            const code = codeInput.value.trim();
+            
+            if (!code) {
+                showError('please paste some code to explain');
+                return;
+            }
+            
+            const btn = document.getElementById('explainBtn');
+            const resultDiv = document.getElementById('explanationResult');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span>analyzing...';
+            
+            try {
+                const prompt = `Please explain this code step by step:\n\n${code}`;
+                const response = await callOllama(prompt, true);
+                
+                resultDiv.innerHTML = `
+                    <div class="explanation-result">
+                        <div style="color: var(--main-color); margin-bottom: 1rem; font-weight: 500;">simian's explanation:</div>
+                        <div style="white-space: pre-line;">${response}</div>
+                    </div>
+                `;
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'explain code';
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            const input = document.getElementById('messageInput');
+            const codeInput = document.getElementById('codeInput');
+            
+            // Enter to send (in chat)
+            if (e.key === 'Enter' && !e.shiftKey && currentTab === 'chat' && document.activeElement === input) {
+                e.preventDefault();
+                sendMessage();
+            }
+            
+            // Ctrl + Enter to explain code
+            if (e.key === 'Enter' && e.ctrlKey && currentTab === 'explain' && document.activeElement === codeInput) {
+                e.preventDefault();
+                explainCode();
+            }
+            
+            // Escape to clear
+            if (e.key === 'Escape') {
+                if (currentTab === 'chat') {
+                    input.value = '';
+                } else {
+                    codeInput.value = '';
+                    document.getElementById('explanationResult').innerHTML = '';
+                }
+            }
+        });
+
+        // Settings change handlers
+        document.getElementById('ollamaUrl').addEventListener('change', () => {
+            saveSettings();
+            checkConnection();
+        });
+
+        document.getElementById('modelSelect').addEventListener('change', saveSettings);
+        document.getElementById('temperature').addEventListener('change', saveSettings);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            checkConnection();
+            
+            // Check connection every 10 seconds
+            setInterval(checkConnection, 10000);
+        });
+    </script>
+</body>
+</html>
