@@ -5,20 +5,18 @@
 |_|  |_|\___/|_| |_|_|\_\___|\__, | /_/   \_\___|
                              |___/                
 
-# Monkey AI - Your Local Coding Assistant
+# Simian - Your Local Chatbot.
 
-A smart, privacy-first AI assistant that runs locally on your computer using Ollama. No data leaves your machine.
+A smart, offline, privacy-first AI assistant that runs locally on your computer using Ollama. No data leaves your machine.
 
 ## Features
 
-- 🔒 **100% Private** - Everything runs locally using Ollama
-- 🚀 **Auto-Start** - Automatically starts Ollama when needed
-- 💻 **VS Code Extension** - Integrated coding assistant 
-- 🌐 **Web Interface** - Beautiful browser-based chat
+- ꗃ **100% Private** - Everything runs locally using Ollama
+- 🖥 **VS Code Extension** - Integrated coding assistant 
+- ᯤ **Web Interface** - Beautiful browser-based chat
 - ⚡ **Multiple Models** - Support for LLaMA, CodeLlama, Mistral, and more
-- 🔄 **Dual Mode** - Switch between local (Ollama) and cloud (API) modes
 
-## 🎯 Quick Start
+##  Quick Start
 
 ### One-Command Setup
 ```bash
@@ -98,13 +96,13 @@ ollama pull mistral         # Fast responses
 
 ```
 monkey-ai/
-├── 📄 start.js              # Main launcher (run this!)
+├── 📄 start.js              # ⏻ Main launcher (run this!)
 ├── 📄 ollama-manager.js     # ⚡ Auto Ollama starter
 ├── 📄 launch-web.js         # 🌐 Web server launcher
 ├── 📄 extension.js          # 💻 VS Code extension
 ├── 📄 package.json          # 📦 Extension manifest
 ├── 📄 index.html            # 🎨 Web interface
-└── 📄 README.md             # 📖 This file
+└── 📄 README.md             # 📄 This file
 ```
 
 ## Advanced Usage
@@ -164,6 +162,10 @@ If Ollama runs on a different port, update the web interface or extension settin
 2. Add to the dropdown in `index.html`
 3. Add to VS Code settings in `package.json`
 
+### Custom Models
+1. Open file monkeyzero-creator.js, this is a template for custom AI models.
+2. Replace ${this.baseModel} with your chosen model. For lightweight models, I recommend tinyllama or phi. For any other ones, use gpt-oss, deepseek-r1, or mistral. 
+
 ### Customizing the Web Interface
 - Edit `index.html` for UI changes
 - Modify `launch-web.js` for server behavior
@@ -202,4 +204,4 @@ MIT License - feel free to use and modify!
 
 ---
 
-**Happy coding with Monkey AI! 🐵**
+**Happy coding with Simian!**
