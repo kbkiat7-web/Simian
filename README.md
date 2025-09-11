@@ -15,6 +15,8 @@
 # Simian - Your Local Chatbot.
 
 A smart, offline, privacy-first AI assistant that runs locally on your computer using Ollama. No data leaves your machine.
+Discord: https://discord.gg/UZzuJrVfvz
+
 
 ## Features
 
